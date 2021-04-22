@@ -1,6 +1,6 @@
 function SimuPop = DrawPopulation(cfg,zeroinfec) 
 
-% SimuPop = DrawPopulation(cfg)
+% SimuPop = DrawPopulation(cfg,zeroinfec)
 %
 % Draw population from specific parameter set in struct cfg, obtained by
 % calling:
@@ -40,7 +40,7 @@ SimuPop.Calc.Infectivity = {};
 SimuPop.Calc.DiseaseCourse = {};
 
 % Add Agents to Clinic (this should be vectorized, currently efficiency
-% bottleneck when Population in each Simulation)
+% bottleneck when population is drawn in each simulation)
 for ii = 1:(np+nw)
         
     if ii < np + 1

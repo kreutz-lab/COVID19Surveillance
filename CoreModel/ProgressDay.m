@@ -1,4 +1,7 @@
 function SimuPop = ProgressDay(SimuPop)
+
+% SimuPop = ProgressDay(SimuPop)
+%
 % Simulates default dynamics from GlobalDay to GlobalDay+1.
 
 % 0: N (Left Clinic)

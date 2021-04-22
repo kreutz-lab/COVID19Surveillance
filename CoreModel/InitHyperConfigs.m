@@ -50,7 +50,7 @@ function cfgHyper = InitHyperConfigs
 % probRisk: Assignment of workers to risk groups
 % leaveTime: Duration of patient stay
 % matrixContactStructure: Relative frequency of contacts between groups
-% InfectiousShift: Range of possible presymotomatic period values
+% InfectiousShift: Range of possible presymptomatic period values
 %
 % Random:
 % 

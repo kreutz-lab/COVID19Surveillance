@@ -1,10 +1,13 @@
-% Combines outputs across simulations.
+% Combines outputs across many simulations. This is desirable if many
+% simulations of the same scenarios have been generated and need to be
+% merged
 %
-% Copy function corresponding results folder and replace search for right
-% string
+% This is more of a template. Function only works if it is in the same
+% folder as all the data sets which is also the directory and the right 
+% search string is specified.
 
 directory = dir;
-ind_files = strmatch('prevalence',{directory.name});
+ind_files = strmatch('quartest',{directory.name});
 results = cell(1,length(ind_files));
 
 for ii = 1:length(ind_files)

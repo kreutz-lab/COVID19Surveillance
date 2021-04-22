@@ -3,7 +3,7 @@ function QuarTestPlot(Outbreak_tot,Quar_tot,Test_tot,casenames,case_ind)
 subs = gobjects(1,2);
 kk_cases = length(casenames);
 del = 0.15;
-f = figure('Position',[100,100,1100,800]);
+f = figure('Position',[100,100,1100,900]);
 
 for ii = 1:2   
     if ii == 1
@@ -33,7 +33,7 @@ for ii = 1:2
         set(hs(jj),'MarkerSize',30)
     end
     set(gca,'YTick',1:kk_cases);
-    set(gca,'YTickLabel',RemapNames(casenames),'FontSize',12);
+    set(gca,'YTickLabel',RemapNames(casenames,1),'FontSize',12);
     set(gca,'TickLabelInterpreter','none');
     set(gca,'YGrid','on');
     legend([ggplot(1),meanline,ggplot(2)],{'Lower Parameter Bound','Best Parameter Guess',...
@@ -49,11 +49,11 @@ end
 
 set(subs(2),'YTickLabel',{''});
 legend(subs(1),'off');
-set(subs(1),'Position',[0.15,0.1,0.28,0.8]);
-set(subs(2),'Position',[0.48,0.1,0.28,0.8]);
+set(subs(1),'Position',[0.2,0.1,0.28,0.8]);
+set(subs(2),'Position',[0.51,0.1,0.28,0.8]);
 leg = get(subs(2),'Legend');
 pos = get(leg,'Position');
-pos(1) = 0.77;
+pos(1) = 0.8;
 set(leg,'Position',pos);
 
 q_specificity = strcmp(casenames','testSpecificity');
