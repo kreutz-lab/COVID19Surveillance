@@ -1,17 +1,26 @@
 function SimuPop = ProcessQuarantine(SimuPop,q_who)
 
+% SimuPop = ProcessQuarantine(SimuPop,q_who)
+% 
+% Processes actions on the population structed related to quarantine. It is
+% called during ProgressDay.
+%
+% q_who corresponds to individuals which have not permanently left the
+% clinic.
+
 t = SimuPop.GlobalDay;
 
 %% Identify first order targets for quarantine:
 
-% Test results arrived:
+% Test results are accessible:
 q_result = (SimuPop.Calc.TestDelayTimer(:,t) == SimuPop.cfg.testDelay)  & ...
     q_who;
-% Positive result:
+% Accessible result is positive:
 q_pos = q_result & (SimuPop.Calc.TestResults(:,t) == 1);
-% Tested positive in surveillance testing:
+% Tested positive in active surveillance testing:
 q_quar_test = q_pos & (SimuPop.Calc.Quarantined(:,t) == 0);
-% Tested first time positive in quarantine:
+% Tested first time positive in quarantine to indicate individuals for
+% contact tracing:
 if t > 1
     if SimuPop.cfg.testDelay ~= 0
         q_firstpos = q_pos;
@@ -25,17 +34,17 @@ if t > 1
 else
     q_firstpos = zeros(size(q_pos));
 end
-% Those who are symptomatic
+% Symptomatic non-quarantined individuals:
 q_quar_symp = (SimuPop.Calc.StateID(:,t) == 5) & ...
     (SimuPop.Calc.Quarantined(:,t) == 0) & q_who;
-% Add false alarms:
+% Fake symptomatic individuals:
 n_clinic = SimuPop.cfg.nPatients + SimuPop.cfg.nWorkers;
 q_fakesymp = PickRandomExisting(q_who,...
     binornd(n_clinic,SimuPop.cfg.fracIso*...
     SimuPop.cfg.expectedFalseAlarms/n_clinic));
 q_quar_symp = q_fakesymp | q_quar_symp;
 % Symptomatic patients returning from leave are covered by the symptomatic
-% isolation strat before they have a chance to infect
+% isolation strategy before they have a chance to infect
 q_quar_symp = q_quar_symp & (rand(size(q_quar_symp)) < SimuPop.cfg.fracIso);
 
 %% Identify second order targets for quarantine:
@@ -84,7 +93,7 @@ q_quarenter = q_quar_test | q_quar_symp | q_quar_trace;
 
 % If people should be quarantined by any measures, they are brought back
 % into the clinc and quarantined. Since this is 100% effective, the
-% bringing back into the clinic is for convenient handling.
+% transfer back into the clinic is for convenient handling.
 q_return = (SimuPop.Calc.Presence(:,t) == 0) & q_quarenter;
 SimuPop.Calc.Presence(q_return,t) = 1;
 SimuPop.Calc.LeaveTimer(q_return,t) = 0;

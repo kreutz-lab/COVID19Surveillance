@@ -2,15 +2,16 @@ function SimuPop = ProgressDay(SimuPop)
 
 % SimuPop = ProgressDay(SimuPop)
 %
-% Simulates default dynamics from GlobalDay to GlobalDay+1.
-
+% Simulates dynamics from GlobalDay to GlobalDay+1.
+%
+% Agent states:
 % 0: N (Left Clinic)
-% 1: S
-% 2: E
-% 3: I_P
-% 4: I_A
-% 5: I_S
-% 6: R
+% 1: S (Susceptible)
+% 2: E (Exposed)
+% 3: I_P (Presymptomatic)
+% 4: I_A (Asymptomatic)
+% 5: I_S (Symptomatic)
+% 6: R (Recovered)
 
 t = SimuPop.GlobalDay;
 
@@ -51,18 +52,18 @@ if ~isempty(ind_tmp)
     end
 end
 
-%% Quarantine people on day t:
+%% Manage quarantine of people (new or existing) on day t:
 
 SimuPop = ProcessQuarantine(SimuPop,~q_permgone);
 
 %% Simulate infections on day t:
 
-SimuPop = ConductEvent(SimuPop,'default');
-SimuPop = ConductEvent(SimuPop,'defaultoutside');
-SimuPop = ConductEvent(SimuPop,'visit');
-SimuPop = ConductEvent(SimuPop,'afterwork');
+SimuPop = ConductEvent(SimuPop,'default'); %default within clinic
+SimuPop = ConductEvent(SimuPop,'defaultoutside'); %default outside of clinic
+SimuPop = ConductEvent(SimuPop,'visit'); %new infections by visits
+SimuPop = ConductEvent(SimuPop,'afterwork'); %staff after their shift
 
-%% Progress temporal leave states:
+%% Progress temporary leave states:
 
 q_pres = (SimuPop.Calc.Presence(:,t) == 1);
 q_nonpres = (~q_pres) & (~q_permgone);
@@ -93,15 +94,12 @@ end
 
 %% Add newly admitted patients:
 
-if sum(SimuPop.Calc.StateID(:,t) ~= 0) > ...
-        (SimuPop.cfg.maxPatients + SimuPop.cfg.nWorkers)
-    warning('More patients in clinic than allowed. Should not happen.');
-end
-
 N_open = SimuPop.cfg.maxPatients - ...
     sum((SimuPop.Calc.PurposeID(:,t) == 1) & (~q_permgone));
 N_init = SimuPop.cfg.maxPatients - SimuPop.cfg.nPatients;
 newpatients = random('Binomial',N_open,SimuPop.cfg.joinAverage/N_init,1);
+% Patient admission increases with number of unoccupied postions N_open,
+% guarantees that population is not depleted by patients ending their stay
 
 if newpatients ~= 0
     for ii = 1:newpatients

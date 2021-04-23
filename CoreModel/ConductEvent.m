@@ -1,13 +1,15 @@
 function SimuPop = ConductEvent(SimuPop,whichevent,q_who,vararg)
 
+% SimuPop = ConductEvent(SimuPop,whichevent,q_who,vararg)
+%
 % Collection of different events which can be conducted. 
 %
 % 'default': Infection in clinic.
-% 'defaultoutside': Infection when on temproal leave.
-% 'test': Put people in quarantine when result positive.
-% 'afterwork': Infection of worker after shift.
-% 'leave': Set temporal leave.
-% 'visit': Infection of patients who get visited
+% 'defaultoutside': Infection when on temporary leave.
+% 'test': Determine test result of agent.
+% 'afterwork': Infection of staff after shift.
+% 'leave': Initiate temproal leave of agent.
+% 'visit': Infection of patients who get visited.
 
 % Specify scenario-specific q_who as argument. For example: Who gets
 % tested is a property of the scenario, not the general simulation. 
@@ -20,26 +22,31 @@ if strcmp(whichevent,'default')
 % within a day.
     
     whicheventID = 3;
-
+    
+    % Infectious Agents:
     q_inf = ((calc.StateID(:,t) == 3) |  (calc.StateID(:,t) == 4) | ...
         (calc.StateID(:,t) == 5)) & ...
         (calc.Quarantined(:,t) == 0) & (calc.Presence(:,t) == 1);
-    % Infectious Agents
     
+    % Skip if no infectious agents in clinic:
     if sum(q_inf) == 0
         return
     end
     
+    % Agents which can be infected:    
     q_hel = (calc.StateID(:,t) == 1) & (calc.Presence(:,t) == 1) & ...
         (calc.Quarantined(:,t) == 0);
-    % Agents which can be infected
     
+    % Skip if no agents can be infected (will usually not happen):
     if sum(q_hel) == 0
         return
     end    
     
-    p_indivs = NaN(sum(q_inf),sum(q_hel));
+    p_indivs = NaN(sum(q_inf),sum(q_hel)); 
+    % Probabiities that a specific infectious agent will infect a specific
+    % healthy agent
     p_health = ones(size(q_hel));
+    % Overall probabilities for each healthy individual to get infected
     
     % Calculate infection probability between one infected and one healthy
     % individual:
@@ -59,8 +66,7 @@ if strcmp(whichevent,'default')
 
 elseif strcmp(whichevent,'test')
     % Test agents for disease. 
-    
-    % Scenario-specific
+    % Scenario-specific, specify q_who
     
     q_test = (calc.Presence(:,t) == 1) & q_who & ...
         (isnan(calc.TestDelayTimer(:,t)));
@@ -73,26 +79,28 @@ elseif strcmp(whichevent,'test')
     % q_detec: True Positive Possibility
     % q_nodetec: False Positive Probability
     
-    q_detec = q_detec & (rand(length(q_detec),1) < SimuPop.cfg.testSensitivity);
-    q_nodetec = q_nodetec & (rand(length(q_detec),1) > SimuPop.cfg.testSpecificity);
+    % All positive test results:
+    q_detec = q_detec & (rand(length(q_detec),1) < ...
+        SimuPop.cfg.testSensitivity);
+    q_nodetec = q_nodetec & (rand(length(q_detec),1) > ...
+        SimuPop.cfg.testSpecificity);
     q_pos = q_detec | q_nodetec;
-    % Count all Positives
-    SimuPop.Calc.TestDelayTimer(q_test,t) = 0;
-    % TestDelayTimer tracks delay of test to result
+    
+    % Set Test Results in struct:
+    SimuPop.Calc.TestDelayTimer(q_test,t) = 0; % Start Timer to Test Result
     SimuPop.Calc.TestResults(q_pos & q_test,t) = 1;
     SimuPop.Calc.TestResults(~q_pos & q_test,t) = 0;
     % TestResults tracks state of last test performed, 0 if tested
     % negative, 1 if tested positive, NaN for no test available
     % Knowledge about result only once delay is over
+    
+    % Count conducted tests:
     SimuPop.TestCounter = SimuPop.TestCounter + sum(q_test);
     
     return
     
 elseif strcmp(whichevent,'afterwork')
-    % Evaluate the additional infection risk of workers getting infected
-    % after their shift. 
-    %
-    % Use a generic risk modifier.
+    % Evaluate the infection risk of workers getting infected after their shift. 
     
     whicheventID = 4;
     
@@ -104,8 +112,7 @@ elseif strcmp(whichevent,'afterwork')
 
 elseif strcmp(whichevent,'leave')
     % Set the properties of individuals who are leaving the clinic
-    % temporarily.
-    
+    % temporarily.    
     % Scenario-specific
     
     q_leave = (calc.Presence(:,t) == 1) & (calc.Quarantined(:,t) == 0) & q_who;
@@ -118,7 +125,6 @@ elseif strcmp(whichevent,'leave')
     
 elseif strcmp(whichevent,'defaultoutside')
     % Evaluate the infection risk of people who are on temporal leave.
-    % Generic modifier for all absent agents.
     
     whicheventID = 5;
     
@@ -156,7 +162,8 @@ for ii = 1:sum(q_infection)
     SimuPop.Calc.Infectivity{ind_infection(ii)}] = CourseOfDisease(SimuPop.cfg); 
     SimuPop.Calc.StateID(ind_infection(ii),t+1) = ...
         SimuPop.Calc.DiseaseCourse{ind_infection(ii)}(1);
-    % If infection in clinic, draw who spread the infection: 
+    % If infection in clinic, draw who spread the infection by their
+    % probability of infection:
     if whicheventID == 3
         % Transform infection index to infection index on healthy people
         % only:
