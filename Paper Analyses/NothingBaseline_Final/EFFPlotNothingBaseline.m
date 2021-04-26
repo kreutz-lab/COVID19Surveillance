@@ -1,4 +1,7 @@
-%load('nothingbaseline35data.mat');
+% load('NothingBaseline35Data.mat');
+%
+% For comments, refer to EFFPlotSensis. Script works exactly the same, but 
+% additionally undoes the special status of some parameters.
 
 f = figure('Position',[150,150,1500,700]);
 subs = NaN(1,2);

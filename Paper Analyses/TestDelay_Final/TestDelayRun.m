@@ -1,5 +1,5 @@
-% Generates the data for the impact of test frequency and compliance on
-% outbreak probability.
+% Generates the data for the impact of test delay on the
+% outbreak probability for the four compared strategies.
 %
 % Code is mainly copy-pasted from "FourStrategiesRun", so refer to this
 % script for comments on basic structure.
@@ -10,12 +10,12 @@ currentpath = cd;
 addpath(genpath(currentpath));
 
 cfgHyper = InitHyperConfigs;
-casenames = {'testSensitivity','compliance'};
-    % Only Sensitivity/Compliance as parameters
+% Analyze sensitivity to test sensitivity:
+casenames = {'testSensitivity'};
 kk_cases = length(casenames);
 remap = [1,2,3];
-nsimu = 3000;
-scens = 8;
+nsimu = 4000;
+scens = 12;
 t = 100;
 Chronos = cell(kk_cases,3,scens,nsimu);
 Quar_tot = NaN(kk_cases,3,scens,nsimu);
@@ -84,24 +84,43 @@ for jj = 1:nsimu
                 cfgRandom.(casenames{kk}) = ...
                     cfgHyper.Sensitivity.(casenames{kk})(2);
                 
+                % Define 12 scenarios: 3 delays x 4 strategies
+                if sum(nn == 1:4) == 1
+                    SimuPop.cfg.testDelay = cfgHyper.Scenario.testDelay(3);
+                elseif sum(nn == 5:8) == 1
+                    SimuPop.cfg.testDelay = cfgHyper.Scenario.testDelay(2);
+                elseif sum(nn == 9:12) == 1
+                    SimuPop.cfg.testDelay = cfgHyper.Scenario.testDelay(1);
+                end
+                
                 for ii = 2:t
                     
                     SimuPop = ProgressDay(SimuPop);
                     
-                    q_who_base = (SimuPop.Calc.Quarantined(:,ii) == 0);
-                    
-                    % Entry Testing:
-                    q_who = (SimuPop.Calc.LastLeaveTimer(:,ii) == 0) | ...
-                        (SimuPop.Calc.LastLeaveTimer(:,ii) == 5);
-                    q_who = q_who & q_who_base;
-                    SimuPop = ConductEvent(SimuPop,'test',q_who);
-                    
-                    % Test every nn days (or never for nn = 8)
-                    if nn ~= 8
-                        if rem(SimuPop.GlobalDay,nn) == 0 
-                            q_who = (SimuPop.Calc.Compliance(:,ii) == 1);
-                            q_who = q_who & q_who_base;
-                            SimuPop = ConductEvent(SimuPop,'test',q_who);
+                    % Define which strategy is used, but account for
+                    % different test delays:
+                    if rem(nn,4)~= 1
+                        q_who_base = (SimuPop.Calc.Quarantined(:,ii) == 0);
+                        
+                        q_who = (SimuPop.Calc.LastLeaveTimer(:,ii) == 0) | ...
+                            (SimuPop.Calc.LastLeaveTimer(:,ii) == 5);
+                        q_who = q_who & q_who_base;
+                        SimuPop = ConductEvent(SimuPop,'test',q_who);
+                        
+                        if rem(nn,4) ~= 2
+                            if SimuPop.WeekDay == 5
+                                q_who = (SimuPop.Calc.Compliance(:,ii) == 1);
+                                q_who = q_who & q_who_base;
+                                SimuPop = ConductEvent(SimuPop,'test',q_who);
+                            end
+                            
+                            if rem(nn,4) ~= 3
+                                if SimuPop.WeekDay == 2
+                                    q_who = (SimuPop.Calc.Compliance(:,ii) == 1);
+                                    q_who = q_who & q_who_base;
+                                    SimuPop = ConductEvent(SimuPop,'test',q_who);
+                                end
+                            end
                         end
                     end
                     
@@ -124,4 +143,4 @@ for jj = 1:nsimu
 end
 
 strid = datestr(now,30);
-save(['freqsys',strid,'.mat']);
+save(['testdelaysuperserious',strid,'.mat']);

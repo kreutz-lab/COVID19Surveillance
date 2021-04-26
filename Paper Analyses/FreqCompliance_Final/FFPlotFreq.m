@@ -5,7 +5,7 @@ function FFPlotFreq(Outbreak_tot,whichcase,logo)
 % Plots outbreak probability as function of Test Frequency and Compliance
 % or Sensitivity. 
 %
-% logo = 0: Absolute probability
+% logo = 0: Absolute probability (maximum nomalized to 1)
 % logo = 1: Log2(Absolute Probability)
 % logo = 2: Ratio to Best
 %
@@ -22,7 +22,8 @@ else
     return
 end
 
-freq_data = [1./(1:7),0];
+% Define plot data:
+freq_data = [1./(1:7),0]; %Express conditions as frequencies
 mu_data = mean(squeeze(Outbreak_tot(indwhich,:,:,:)),3);
 sd_data = sqrt(mu_data.*(1-mu_data)/size(Outbreak_tot,4));
 log_data = log2(mu_data);
@@ -33,6 +34,7 @@ errprog = @(x,y,sigx,sigy) ...
 sd_log_data = errprog(mu_data(1:2,:),mu_data(1:2,:),...
     sd_data(1:2,:),sd_data(1:2,:));
 
+% Define plot data case-dependently:
 if logo == 0
     x = repmat(freq_data,[3,1]);
     y = mu_data/max(mu_data,[],[1,2]);
@@ -57,6 +59,7 @@ elseif logo == 2
 end
     
 hold on
+% Plot points and errors
 ggplot = gscatter(x(:),y(:),g(:),'bgr','',30);
 erplot = errorbar(x',y',sd','LineStyle','none','LineWidth',1.5);
 for mm = 1:length(ggplot)
@@ -70,6 +73,8 @@ end
 legend(ggplot,leg_txt,'Location','northeast');
 
 grid on
+
+% Manipulation of ticks and labels:
 xlabel('Time Between Subsequent Tests [Days]','FontSize',12)
 freqdatasort = sort(freq_data);
 xticks(freqdatasort)

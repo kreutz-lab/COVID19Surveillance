@@ -4,18 +4,19 @@ function FFPlotDelay(Outbreak_tot,logo)
 %
 % Basic Plot for Test-to-Result Delay Data.
 %
+% logo = 0: Absolute probability (maximum nomalized to 1)
+% logo = 1: Log2(Absolute Probability)
+%
 % load('TestDelaySerious35Data.mat')
 
-indwhich = 1;
-
+% Define plot data and rearrange 12 scenarios into 4x3 matrix:
 delays = [2,1,0];
-mu_data = mean(squeeze(Outbreak_tot(indwhich,:,:,:)),3);
+mu_data = mean(squeeze(Outbreak_tot(1,:,:,:)),3);
 mu_shape = reshape(mu_data,[3,4,3]);
 sd_shape = 1*sqrt(mu_shape.*(1-mu_shape)/size(Outbreak_tot,4));
-
 mu_plot = squeeze(mu_shape(2,:,:));
 sd_plot = squeeze(sd_shape(2,:,:));
-
+ % Prepare plot:
 x = repmat(delays,[4,1]);
 normali = max(mu_plot,[],[1,2]);
 g = repmat([1;2;3;4],[1,3]);
@@ -28,9 +29,10 @@ elseif logo == 1
     sd = log2(exp(1))*sd_plot./mu_plot;
     ylab = 'Log2(Relative Outbreak Probability)';
 end
-
 clrs = lines(10);
+
 hold on
+% Plot data and errors:
 ggplot = gscatter(x(:),y(:),g(:),clrs(1:4,:),'',30);
 erplot = errorbar(x',y',sd','LineStyle','none','LineWidth',1.5);
 for mm = 1:length(ggplot)
@@ -38,6 +40,7 @@ for mm = 1:length(ggplot)
 end
 hold off
 
+% Other general changes:
 grid on
 if logo == 0
     ylim([0,1.01]);

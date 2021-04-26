@@ -1,5 +1,5 @@
-function Outbreak_tot = AnalyzeSensis(Chronos,infthresh,tthresh)
-% Outbreak_tot = AnalyzeSensis(Chronos,infthresh,tthresh)
+function Outbreak_tot = AnalyzeOutbreak(Chronos,infthresh,tthresh)
+% Outbreak_tot = AnalyzeOutbreak(Chronos,infthresh,tthresh)
 %
 % Assigns a boolean variable to each simulation stored in Chronos, which is
 % a cell array of infection chronologies. An Outbreak is defined as 

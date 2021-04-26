@@ -7,7 +7,7 @@
 % search string is specified.
 
 directory = dir;
-ind_files = strmatch('quartest',{directory.name});
+ind_files = strmatch('seriousnew',{directory.name});
 results = cell(1,length(ind_files));
 
 for ii = 1:length(ind_files)

@@ -1,5 +1,5 @@
-% Generates the data for the impact of test frequency and compliance on
-% outbreak probability.
+% Generates the data for the comparison of baseline surveillance to no
+% surveillance.
 %
 % Code is mainly copy-pasted from "FourStrategiesRun", so refer to this
 % script for comments on basic structure.
@@ -10,12 +10,11 @@ currentpath = cd;
 addpath(genpath(currentpath));
 
 cfgHyper = InitHyperConfigs;
-casenames = {'testSensitivity','compliance'};
-    % Only Sensitivity/Compliance as parameters
+casenames = fieldnames(cfgHyper.Sensitivity);
 kk_cases = length(casenames);
 remap = [1,2,3];
-nsimu = 3000;
-scens = 8;
+nsimu = 10;
+scens = 2;
 t = 100;
 Chronos = cell(kk_cases,3,scens,nsimu);
 Quar_tot = NaN(kk_cases,3,scens,nsimu);
@@ -74,11 +73,18 @@ for jj = 1:nsimu
                         profile_eff_matrix(remap(mm),2));
                 elseif strcmp(casenames(kk),'IncubationMean')
                     cfg = CalibrateConfigs(cfgRandom,...
-                        profile_eff_matrix(remap(mm),2));
+                        profile_eff_matrix(2,remap(mm)));
                 else
                     cfg = CalibrateConfigs(cfgRandom,...
                         profile_eff_matrix(2,2));
                 end
+                
+                if nn == 1
+                   % This already defines "no surveillance"
+                   cfg.fracIso = 0;
+                   cfg.fracTrace = 0;
+                end
+                
                 SimuPop.cfg = cfg;
                 
                 cfgRandom.(casenames{kk}) = ...
@@ -86,24 +92,10 @@ for jj = 1:nsimu
                 
                 for ii = 2:t
                     
+                    % No other events during progression necessary to
+                    % simulate baseline surveillance.
+                    
                     SimuPop = ProgressDay(SimuPop);
-                    
-                    q_who_base = (SimuPop.Calc.Quarantined(:,ii) == 0);
-                    
-                    % Entry Testing:
-                    q_who = (SimuPop.Calc.LastLeaveTimer(:,ii) == 0) | ...
-                        (SimuPop.Calc.LastLeaveTimer(:,ii) == 5);
-                    q_who = q_who & q_who_base;
-                    SimuPop = ConductEvent(SimuPop,'test',q_who);
-                    
-                    % Test every nn days (or never for nn = 8)
-                    if nn ~= 8
-                        if rem(SimuPop.GlobalDay,nn) == 0 
-                            q_who = (SimuPop.Calc.Compliance(:,ii) == 1);
-                            q_who = q_who & q_who_base;
-                            SimuPop = ConductEvent(SimuPop,'test',q_who);
-                        end
-                    end
                     
                     if SimuPop.WeekDay == 6
                         q_who = (SimuPop.Calc.PurposeID(:,ii) == 1);
@@ -124,4 +116,4 @@ for jj = 1:nsimu
 end
 
 strid = datestr(now,30);
-save(['freqsys',strid,'.mat']);
+save(['nothingbaseline',strid,'.mat']);
