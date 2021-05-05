@@ -1,4 +1,13 @@
 function newnames = RemapNames(whichnames,varname)
+% newnames = RemapNames(whichnames,varname)
+%
+% Maps model internal parameter names to "nice" parameter names for
+% figures.
+%
+% whichnames: Parameter names to be replaced
+% varname: If 0 is used, parameter names are displayed without symbols.
+%               Conversely, any other value means thaht parameter symbols
+%               are displayed next to parameter names.
 
 if ~exist('varname','var')
     varname = 0;
@@ -6,6 +15,7 @@ end
 
 newnames = cell(size(whichnames));
 
+% List of old names ("domain")
 mapdom = {'IncubationMean','SymptomMean','IncubationSD','SymptomSD',...
     'PeakShift','fracAsymp','asympInfec_rel',...
     'infectivityShape','pInitInfec','R0','baseInfection',...
@@ -14,7 +24,9 @@ mapdom = {'IncubationMean','SymptomMean','IncubationSD','SymptomSD',...
     'testSensitivity','testSpecificity',...
     'modifierRisk','compliance'};
     
+% List of new names ("image")
 if varname == 0
+    % ... without symbols
     mapimg = {'IncubationMean','SymptomMean','IncubationSD','SymptomSD',...
         'PeakInfectiousness','AsymptomaticFraction','AsymptomaticInfectivity',...
         'InfectivityHeterogeneity','Prevalence','R0','OutsideInfection',...
@@ -23,6 +35,7 @@ if varname == 0
         'TestSensitivity','TestSpecificity',...
         'HeterogeneityModifier','TestCompliance'};
 else
+    % ... with symbols
     mapimg = {'IncubationMean \mu_{inc}','SymptomMean \mu_{symp}',...
         'IncubationSD \sigma_{inc}','SymptomSD \sigma_{symp}',...
         'PeakInfectiousness \sl t_{peak}','AsymptomaticFraction \sl A',...
@@ -34,6 +47,7 @@ else
         'HeterogeneityModifier \sl h_{mod}','TestCompliance'};    
 end
 
+% Check list of given names and make list of new names
 for ii = 1:length(newnames)
    q_tmp = strcmp(whichnames{ii},mapdom);
    newnames{ii} = mapimg{q_tmp};

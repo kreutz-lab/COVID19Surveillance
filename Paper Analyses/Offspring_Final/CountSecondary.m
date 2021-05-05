@@ -3,7 +3,7 @@ function counts_sec = CountSecondary(SimuPop)
 % counts_sec = CountSecondary(SimuPop)
 %
 % Counts secondary infections of primary infector. Checks whether primary
-% infector is in clinic for at least 25 days and infection occurred 25
+% infector is in clinic for at least 25 more days and infection occurred 25
 % days before end of simulation.
 
 chrono = SummarizeInfections(SimuPop);

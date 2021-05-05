@@ -1,10 +1,14 @@
+% Plots different distributions of individual infectivity.
+
 crvs = gobjects(3,1);
 
+% Define pdfs:
 x = 0:0.01:4;
 y1 = pdf('Gamma',x,1.5,1/1.5);
 y2 = pdf('Gamma',x,10,1/10);
 y3 = pdf('Gamma',x,50,1/50);
 
+% Plot pdfs:
 clrs = lines(10);
 hold on
 crvs(1) = plot(x,y1,'Color',clrs(6,:));
@@ -14,12 +18,14 @@ ylims = get(gca,'YLim');
 meaninfec = line([1,1],ylims,'Color','k','LineStyle','--','LineWidth',2);
 hold off
 
-set(crvs,'LineWidth',2);
+% Labels & Legend:
 xlabel('Infectivity Factor');
 ylabel('Probability Density');
 legend([crvs;meaninfec],{'Shape = 1.5','Shape = 10',...
     'Shape = 50','Mean Infectivity'},'FontSize',11);
 
+% Aesthetic changes:
+set(crvs,'LineWidth',2);
 xaxis_handle = get(gca,'XAxis');
 set(xaxis_handle,'FontSize',11,'Linewidth',1);
 yaxis_handle = get(gca,'YAxis');

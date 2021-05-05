@@ -1,4 +1,4 @@
-% Plots Course of Disease Property Plot
+% Plots Infectivity Profiles and Time Distributions into subplots:
 
 f = figure('Position',[150,150,1300,400]);
 subs = gobjects(2,1);

@@ -6,7 +6,15 @@ Simulation data is publicly available here: https://owncloud.imbi.uni-freiburg.d
 
 21.04.2021
 * Added first code version
+
 22.04.2021
 * Comments and Clean-Up in core model functions
+
 23.04.2021
 * More comments in core model functions
+
+26.04.2021
+* Comments and renaming of paper analysis functions
+
+05.05.2021
+* Finalized comments to paper analysis functions
