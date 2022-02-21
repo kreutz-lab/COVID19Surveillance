@@ -58,12 +58,14 @@ elseif logo == 2
     ylab = 'Log2(Outbreak Probability Ratio)';
 end
     
+clr = [119,172,48;77,190,238;162,20,47]/255;
 hold on
 % Plot points and errors
 ggplot = gscatter(x(:),y(:),g(:),'bgr','',30);
 erplot = errorbar(x',y',sd','LineStyle','none','LineWidth',1.5);
 for mm = 1:length(ggplot)
-    set(erplot(mm),'Color',get(ggplot(mm),'Color'));
+    set(erplot(mm),'Color',clr(mm,:));
+    set(ggplot(mm),'Color',clr(mm,:));
 end
 
 if logo == 0

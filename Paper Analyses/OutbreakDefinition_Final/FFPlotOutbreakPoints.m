@@ -36,7 +36,7 @@ ylim([ylim_old(1),0.01]);
 xticks(reremap);
 
 grid on
-xlabel('Number of Infections Defined as Outbreak N_{out}','FontSize',12);
+xlabel('Outbreak Size N_{out}','FontSize',12);
 ylabel('Log2(Relative Outbreak Probability)','FontSize',12);
 title('Outbreak Size Definition','FontSize',14);
 

@@ -61,7 +61,7 @@ for ii = 1:3
     ylab_handle = get(subs(ii),'YLabel');
     set(ylab_handle,'FontSize',13);
     leg = get(subs(ii),'Legend');
-    set(leg,'FontSize',10,'AutoUpdate','off');
+    set(leg,'FontSize',9,'AutoUpdate','off');
     xlims = get(subs(ii),'XLim');
     line(subs(ii),xlims,[0,0],'LineWidth',2,...
         'LineStyle','--','Color',[0,0,0]);

@@ -58,7 +58,7 @@ for ii = 1:(np+nw)
 end
 
 if zeroinfec == 1
-    cfg.pInitInfec = pInitOld;
+    SimuPop.cfg.pInitInfec = pInitOld;
 end
 
 end

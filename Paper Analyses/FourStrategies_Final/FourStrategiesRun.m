@@ -93,7 +93,7 @@ for jj = 1:nsimu
                         profile_eff_matrix(remap(mm),2));
                 elseif strcmp(casenames(kk),'IncubationMean')
                     cfg = CalibrateConfigs(cfgRandom,...
-                        profile_eff_matrix(remap(mm),2));
+                        profile_eff_matrix(2,remap(mm)));
                 else
                     cfg = CalibrateConfigs(cfgRandom,...
                         profile_eff_matrix(2,2));
